@@ -1,0 +1,108 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "E-commerce API",
+        "description": "API for E-commerce application.",
+        "version": "1.0.0"
+    },
+    "host": "localhost:3000",
+    "securityDefinitions" : {
+        "JWT" : {
+            "in" : "header",
+            "name" : "Authorization",
+            "type" : "apiKey"
+        }
+    },
+    "basePath": "/api",
+    "schemes": "http",
+    "paths": {
+        "/user/login": {   
+            "post": {
+                "summary": "login user and generate token.",
+                "description": "generate token.",
+                "tags" : ["users"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "user credentials",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400" : {
+                        "description" : "Incorrect credentials"
+                    }
+                }
+            }
+        },
+        "/user/signup": {   
+            "post": {
+                "summary": "create user.",
+                "description": "generate token.",
+                "tags" : ["user signUp"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "user credentials",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "name" : {
+                                "type" : "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            },
+                            "type" : {
+                                "type" : "string",
+                                "enum" : ["customer", "seller"]
+                            }
+                        }
+                    }
+                }],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400" : {
+                        "description" : "Incorrect credentials"
+                    }
+                }
+            }
+        },
+        "/product": {
+            "get": {
+                "tags" : ["products"],
+                "summary": "get all products.",
+                "description": "get all products data with details.",
+                "produces": "application/json",
+                "security" : [{
+                    "JWT" : {}
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400" : {
+                        "description" : "Incorrect credentials"
+                    }
+                }
+            }
+        }
+    }
+}
