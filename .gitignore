@@ -3,4 +3,5 @@ node_modules
 logs.txt
 *.txt
 *.log
+user.repository_stale.js
 src/public/imageFiles/

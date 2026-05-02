@@ -16,6 +16,7 @@ import ApplicationError from "./src/error_handler/app.error.js";
 // import { connectToDB } from "./src/config/mongoDB.config.js";
 import orderRoutes from "./src/features/order/order.routes.js";
 import { connectToDBWihtMongoose } from "./src/config/mongoose.config.js";
+import mongoose from "mongoose";
 
 const app = express();
 const port = 3000;
@@ -78,10 +79,15 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   if (err instanceof ApplicationError) {
     const { code, message } = err;
-    res.status(code).send(message);
+    return res.status(code).send(message);
+  }
+  if (err instanceof mongoose.Error.ValidationError) {
+    const { message } = err;
+    // Mongoose ValidationError doesn't have an HTTP status code, so we manually send 400 (Bad Request)
+    return res.status(400).send(message);
   }
   console.error(err.stack);
-  res.status(500).send("something went wrong!");
+  return res.status(500).send("something went wrong!");
 });
 
 app.listen(port, () => {
