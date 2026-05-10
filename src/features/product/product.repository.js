@@ -2,6 +2,9 @@ import { ObjectId } from "mongodb";
 import { getDataBase } from "../../config/mongoDB.config.js";
 import ApplicationError from "../../error_handler/app.error.js";
 import { errorLogger } from "../../middlewares/user/logger.middleware.js";
+import { Product, productSchema } from "./product.schema.js";
+import { userSchema } from "../user/user.schema.js";
+import { Review } from "./review.schema.js";
 
 export default class ProductRepository {
   //constructor(parameters) {}
@@ -184,44 +187,79 @@ export default class ProductRepository {
   // }
 
   //clean version of rateProduct. above one is not that easy to understand
+  // async rateProduct(userId, productId, rating) {
+  //   //rateProduct using mongodb. below function is using mongoose
+  //   try {
+  //     //get database
+  //     const db = getDataBase();
+
+  //     //get collection
+  //     const collection = db.collection("products");
+
+  //     const productFound = await collection.findOne({
+  //       _id: ObjectId.createFromHexString(productId),
+  //     });
+
+  //     if (!productFound) {
+  //       throw new ApplicationError(404, "product not found");
+  //     }
+  //     //rate product
+  //     //******pull(remove) existing rating
+  //     await collection.updateOne(
+  //       { _id: ObjectId.createFromHexString(productId) },
+  //       {
+  //         //new ObjectId() is depricated so instead of that use
+  //         // ObjectId.createFromHexString(userId)
+  //         $pull: { ratings: { userId: ObjectId.createFromHexString(userId) } }, // removes rating if user tries to rate again and
+  //       },
+  //     );
+  //     //******push new rating
+  //     await collection.updateOne(
+  //       { _id: ObjectId.createFromHexString(productId) },
+  //       {
+  //         $push: {
+  //           // adds new rating for the product
+  //           ratings: {
+  //             rating: rating,
+  //             userId: ObjectId.createFromHexString(userId),
+  //           },
+  //         },
+  //       },
+  //     );
+  //   } catch (e) {
+  //     const errorMessage = `Error in ProductRepository - rate product: ${e.message}`;
+  //     errorLogger.error(errorMessage);
+  //     //console.log(e);
+  //     throw new ApplicationError(500, "something went wrong");
+  //   }
+  // }
+
+  //rate product using mongoose
   async rateProduct(userId, productId, rating) {
     try {
-      //get database
-      const db = getDataBase();
-
-      //get collection
-      const collection = db.collection("products");
-
-      const productFound = await collection.findOne({
-        _id: ObjectId.createFromHexString(productId),
-      });
-
-      if (!productFound) {
-        throw new ApplicationError(404, "product not found");
+      //checking for the product
+      const productDocument = await Product.findById(productId); //here no need to pass id as {_id : };
+      if (!productDocument) {
+        throw new Error("Product not found");
       }
-      //rate product
-      //******pull(remove) existing rating
-      await collection.updateOne(
-        { _id: ObjectId.createFromHexString(productId) },
-        {
-          //new ObjectId() is depricated so instead of that use
-          // ObjectId.createFromHexString(userId)
-          $pull: { ratings: { userId: ObjectId.createFromHexString(userId) } }, // removes rating if user tries to rate again and
-        },
-      );
-      //******push new rating
-      await collection.updateOne(
-        { _id: ObjectId.createFromHexString(productId) },
-        {
-          $push: {
-            // adds new rating for the product
-            ratings: {
-              rating: rating,
-              userId: ObjectId.createFromHexString(userId),
-            },
-          },
-        },
-      );
+
+      //checking if rating exists or not
+      const reviewDocument = await Review.findOne({ productId, userId });
+
+      //if rating exists then upadate
+      if (reviewDocument) {
+        reviewDocument.rating = rating;
+        await reviewDocument.save();
+      } else {
+        const newReview = new Review({
+          productId,
+          userId,
+          rating,
+        });
+        await newReview.save();
+      }
+
+      //if rating doensnt exists then insert
     } catch (e) {
       const errorMessage = `Error in ProductRepository - rate product: ${e.message}`;
       errorLogger.error(errorMessage);

@@ -3,6 +3,7 @@ import ProductRepository from "./product.repository.js";
 import { errorLogger } from "../../middlewares/user/logger.middleware.js";
 import UserRepository from "../user/user.repository.js";
 import ApplicationError from "../../error_handler/app.error.js";
+import Category from "./category.schema.js";
 
 export default class ProductController {
   constructor() {
