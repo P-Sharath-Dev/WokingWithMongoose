@@ -11,13 +11,13 @@ export const productSchema = new mongoose.Schema({
   reviews: [
     // using array coz here we store multiple values(means multiple users id's who gave review)
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Review",
     },
   ],
   categories: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
   ],

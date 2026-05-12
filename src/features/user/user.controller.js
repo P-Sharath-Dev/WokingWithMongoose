@@ -49,15 +49,15 @@ export default class userController {
     try {
       const { name, email, password, type } = req.body;
       // Validate plain text password manually before hashing
-      const passwordRegex =
-        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-      if (!passwordRegex.test(password)) {
-        return res
-          .status(400)
-          .send(
-            "Password should be 8 to 12 chars, at least one special char and one number",
-          );
-      }
+      // const passwordRegex =
+      //   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+      // if (!passwordRegex.test(password)) {
+      //   return res
+      //     .status(400)
+      //     .send(
+      //       "Password should be 8 to 12 chars, at least one special char and one number",
+      //     );
+      // }
 
       const hashPassword = await bcrypt.hash(password, 11);
       // console.log("Hashed password:", hashPassword);

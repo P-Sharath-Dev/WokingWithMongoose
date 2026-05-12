@@ -13,8 +13,8 @@ const jwtAuth = (req, res, next) => {
   //verify token
   try {
     const validToken = jwt.verify(token, process.env.SECRET_KEY);
-    console.log("TOKEN RECEIVED:", token);
-    console.log("DECODED TOKEN:", validToken);
+    // console.log("TOKEN RECEIVED:", token);
+    // console.log("DECODED TOKEN:", validToken);
     //console.log("isValidToken", validToken);
     req.userId = validToken.id;
   } catch (err) {

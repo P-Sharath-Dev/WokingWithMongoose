@@ -3,6 +3,7 @@ import { getDataBase } from "../../config/mongoDB.config.js";
 import ApplicationError from "../../error_handler/app.error.js";
 import { errorLogger } from "../../middlewares/user/logger.middleware.js";
 import { Product, productSchema } from "./product.schema.js";
+import Category from "../product/category.schema.js";
 import { userSchema } from "../user/user.schema.js";
 import { Review } from "./review.schema.js";
 
@@ -12,18 +13,31 @@ export default class ProductRepository {
   //***add product***
   async addProduct(product) {
     try {
+      console.log("product from repo : ", product);
       //get database
-      const db = getDataBase();
+      // const db = getDataBase();
       //create collection
-      const collection = db.collection("products");
+      // const collection = db.collection("products");
+
+      // add product to db
+      const newProduct = new Product(product);
+      const productDocument = await newProduct.save();
+
+      //upadate the category
+      await Category.updateMany(
+        { _id: { $in: product.categories } },
+        { $push: { products: productDocument._id } },
+      );
+
       //inserting product
-      const createdProduct = await collection.insertOne(product);
+      // const createdProduct = await collection.insertOne(product);
       //console.log("createdProduct", createdProduct);
-      return createdProduct;
+      // return createdProduct;
+      return productDocument;
     } catch (e) {
       const errorMessage = `Error in ProductRepository addProduct: ${e.message}`;
       errorLogger.error(errorMessage);
-      //console.log(e);
+      console.log(e);
       throw new ApplicationError(500, "something went wrong");
     }
   }
@@ -239,6 +253,7 @@ export default class ProductRepository {
     try {
       //checking for the product
       const productDocument = await Product.findById(productId); //here no need to pass id as {_id : };
+
       if (!productDocument) {
         throw new Error("Product not found");
       }
@@ -257,6 +272,11 @@ export default class ProductRepository {
           rating,
         });
         await newReview.save();
+
+        // adding review id to the review array in the product
+        productDocument.reviews.push(newReview._id);
+
+        await productDocument.save();
       }
 
       //if rating doensnt exists then insert

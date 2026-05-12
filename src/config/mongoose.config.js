@@ -25,7 +25,7 @@ async function addCategories() {
 
   //create categories if it doesnt exist
   if (!categories | (categories.length == 0)) {
-    const multipleCategories = await Category.insertMany([
+    const categories = await Category.insertMany([
       { name: "Books" },
       { name: "Clothing" },
       { name: "Electronics" },

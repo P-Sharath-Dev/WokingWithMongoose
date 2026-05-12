@@ -13,35 +13,40 @@ export default class ProductController {
   //********add product function***********
   async addProduct(req, res) {
     try {
-      console.log(req.body);
+      console.log("req.body", req.body);
 
-      const { name, description, category, price, stock } = req.body;
+      const { name, description, imageUrl, categories, price, stock } =
+        req.body;
       const userId = req.userId;
       const priceInNumber = Number(price);
       const stockInNumber = Number(stock);
-      console.log(typeof price);
-      const imageUrl = req.file ? `/imageFiles/${req.file.filename}` : null;
+      // console.log(typeof price);
+      // const imageUrl = req.file ? `/imageFiles/${req.file.filename}` : null;
 
       const product = new ProductModel(
         name,
         description,
         imageUrl,
-        category,
+        categories,
         priceInNumber,
         stockInNumber,
       );
-      const userFound = await this.userRepository.getUserById(userId);
-      if (userFound.type !== "seller") {
-        return res.status(401).send("user must be seller");
-      }
+      // const userFound = await this.userRepository.getUserById(userId);
+      // if (userFound.type !== "seller") {
+      //   return res.status(401).send("user must be seller");
+      // }
       const addedProduct = await this.productRepository.addProduct(product);
+      console.log("product created : ", addedProduct);
+      // return res
+      //   .status(201)
+      //   .send({ message: "product added", productId: addedProduct.insertedId });
       return res
         .status(201)
-        .send({ message: "product added", productId: addedProduct.insertedId });
+        .send({ message: "product added", productId: addedProduct._id });
     } catch (e) {
       const errorMessage = `Error in productController all products: ${e.message}`;
       errorLogger.error(errorMessage);
-      //console.log(e);
+      console.log(e);
       throw new ApplicationError(500, "something went wrong");
     }
   }

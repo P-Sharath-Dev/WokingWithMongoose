@@ -15,6 +15,7 @@ import logger from "./src/middlewares/user/logger.middleware.js";
 import ApplicationError from "./src/error_handler/app.error.js";
 // import { connectToDB } from "./src/config/mongoDB.config.js";
 import orderRoutes from "./src/features/order/order.routes.js";
+import likeRoutes from "./src/features/like/like.routes.js";
 import { connectToDBWihtMongoose } from "./src/config/mongoose.config.js";
 import mongoose from "mongoose";
 
@@ -54,6 +55,9 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //app.use('/api/product',basicAuth, porductRoutes);
 app.use("/api/user", userRoutes);
+
+//like routes
+app.use("/api/like", jwtAuth, likeRoutes);
 
 //order routes
 app.use("/api/order", jwtAuth, orderRoutes);
